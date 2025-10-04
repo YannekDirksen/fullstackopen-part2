@@ -3,7 +3,6 @@ import PersonForm from './components/PersonForm';
 import Persons from './components/persons';
 import { SuccessNotification, ErrorNotification } from './components/notification';
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import personService from './services/persons'
 import './index.css'
 
