@@ -1,15 +1,20 @@
 import Filter from './components/filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/persons';
+import { SuccessNotification, ErrorNotification } from './components/notification';
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
+import './index.css'
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
     console.log('effect')
     personService
@@ -40,9 +45,20 @@ const App = () => {
       .update(existingPerson.id, changedPerson)
       .then(response => {
         setPersons(persons.map(person => person.id === existingPerson.id ? response.data : person));
+        setSuccessMessage(`Changed number for ${returnedPerson.name}`);
         setNewName('');
         setNewNumber('');
-      });
+        setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+        setErrorMessage(`Information on ${existingPerson.name} has already been removed from server`);
+        setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+            setPersons(persons.filter(p => p.id !== existingPerson.id));
+    });
   }
      } else {
   const personObject =
@@ -56,6 +72,10 @@ const App = () => {
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
+        setSuccessMessage(`Added ${returnedPerson.name}`);
+        setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
       })
   }
         
@@ -77,6 +97,8 @@ const App = () => {
     );
   return (
   <div>
+    <SuccessNotification message={successMessage} />
+    <ErrorNotification message={errorMessage} />
     <h2>Phonebook</h2>
 
     <Filter value={filter} onChange={handleFilter} />
